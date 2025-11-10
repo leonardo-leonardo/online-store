@@ -6,19 +6,11 @@ st.set_page_config(page_title="🛒 Common Store", layout="wide")
 st.markdown("<h1 style='text-align:center;'>🏪 Common Store</h1>", unsafe_allow_html=True)
 st.markdown("---")
 
-# --- CATEGORY IMAGE KEYWORDS ---
-category_images = {
-    "Electronics": "electronics,gadgets,tech",
-    "Stationery": "stationery,notebook,pen",
-    "Accessories": "wallet,watch,belt",
-    "Clothing": "clothing,tshirt,jacket,fashion",
-    "Kitchen": "kitchen,utensils,appliances",
-    "Sports": "sports,fitness,gear",
-    "Toys": "toy,lego,plush",
-    "Home": "home,decor,interior"
-}
-
-categories = list(category_images.keys())
+# --- CATEGORIES ---
+categories = [
+    "Electronics", "Stationery", "Accessories", "Clothing",
+    "Kitchen", "Sports", "Toys", "Home"
+]
 
 # --- PRODUCT NAME POOLS ---
 product_names = {
@@ -73,7 +65,7 @@ def generate_items():
             if id_counter > 100:
                 break
             price = round(random.uniform(8, 250), 2)
-            img_url = f"https://source.unsplash.com/400x400/?{category_images[cat]}"
+            img_url = f"https://picsum.photos/seed/{cat}{id_counter}/400/400"
             items.append({
                 "id": id_counter,
                 "name": name,
@@ -145,6 +137,7 @@ with tab1:
                     background: linear-gradient(145deg, #ffffff, #f5f5f5);
                     box-shadow: 0 3px 8px rgba(0,0,0,0.1);
                     text-align: center;
+                    transition: transform 0.2s ease-in-out;
                 '>
                     <img src="{item['image']}" width="100%" style="border-radius:10px;">
                     <h5>{item['name']}</h5>
