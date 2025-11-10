@@ -11,7 +11,7 @@ categories = [
     "Kitchen", "Sports", "Toys", "Home"
 ]
 
-# Generate 100 named products with prices
+# Generate 100 named products with prices and working placeholder images
 def generate_items():
     items = []
     for i in range(1, 101):
@@ -52,8 +52,17 @@ def generate_items():
         }[cat]
         product_name = random.choice(name)
         price = round(random.uniform(5, 200), 2)
-        img_url = f"https://source.unsplash.com/400x400/?{cat.lower()}"
-        items.append({"id": i, "name": product_name, "category": cat, "price": price, "image": img_url})
+
+        # Reliable placeholder image from picsum.photos (always loads)
+        img_url = f"https://picsum.photos/seed/{i}/400/400"
+
+        items.append({
+            "id": i,
+            "name": product_name,
+            "category": cat,
+            "price": price,
+            "image": img_url
+        })
     return items
 
 items = generate_items()
@@ -61,10 +70,8 @@ items = generate_items()
 # --- SESSION STATE ---
 if "cart" not in st.session_state:
     st.session_state.cart = []
-
 if "coupon" not in st.session_state:
     st.session_state.coupon = ""
-
 if "pro" not in st.session_state:
     st.session_state.pro = False
 
@@ -100,14 +107,12 @@ with tab1:
     st.subheader("Browse Products")
     selected_category = st.selectbox("Filter by Category", ["All"] + categories)
 
-    col1, col2, col3, col4 = st.columns(4)
-    cols = [col1, col2, col3, col4]
+    cols = st.columns(4)
     col_index = 0
 
     for item in items:
         if selected_category != "All" and item["category"] != selected_category:
             continue
-
         with cols[col_index]:
             st.image(item["image"], use_container_width=True)
             st.markdown(f"**{item['name']}**")
@@ -115,6 +120,8 @@ with tab1:
             if st.button(f"Add to Cart 🛒 {item['id']}", key=f"add_{item['id']}"):
                 add_to_cart(item)
         col_index = (col_index + 1) % 4
+        if col_index == 0:
+            cols = st.columns(4)
 
 # --- TAB 2: Cart ---
 with tab2:
