@@ -1,4 +1,3 @@
-# mega_store_single_page.py
 import streamlit as st
 import random
 
@@ -6,11 +5,11 @@ import random
 # CONFIG
 # ---------------------------
 NUM_ITEMS = 500
-COLUMNS = 4  # number of cards per row
+COLUMNS = 4
 st.set_page_config(page_title="🛒 Mega Store", layout="wide", page_icon="🛍️")
 
 # ---------------------------
-# CSS: modern hover zoom, card styling
+# CSS
 # ---------------------------
 st.markdown("""
 <style>
@@ -79,18 +78,18 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ---------------------------
-# DATA: categories & names
+# DATA
 # ---------------------------
-CATEGORIES = ["Electronics", "Stationery", "Accessories", "Clothing", "Kitchen", "Sports", "Toys", "Home"]
+CATEGORIES = ["Electronics","Stationery","Accessories","Clothing","Kitchen","Sports","Toys","Home"]
 NAME_POOLS = {
-    "Electronics": ["AeroSound Earbuds","VoltPro Power Bank","LumaScreen Monitor","EchoBeam Speaker","NovaCharge Cable","PulseSmart Watch","ByteTab Tablet","ZenBud Earphones"],
-    "Stationery": ["CloudPen Gel","TaskMaster Planner","SketchPro Marker","SharpEdge Scissors","Inkwell Fountain Pen","UltraNote Pad","PaperMate Journal","FlexiRuler 30cm"],
-    "Accessories": ["UrbanFlow Backpack","SnapGrip Wallet","SolarTime Watch","PureLeather Belt","KeyMate Organizer","ComfyCap Hat","PolarShades Glasses","TrendyCase Cover"],
-    "Clothing": ["AeroFit T-shirt","BreezeJog Pants","ComfyCrew Hoodie","StreetWave Jacket","CoolStride Socks","UrbanWalk Shoes","DailyFit Shorts","AquaGuard Raincoat"],
-    "Kitchen": ["AquaBlend Mixer","ChefMate Knife Set","SteamEase Kettle","SmartPan Fryer","EcoCut Board","PureTaste Mug","QuickPrep Blender","SpiceJoy Rack"],
-    "Sports": ["SwiftRun Shoes","PowerGrip Gloves","HydroFlex Bottle","StaminaPro Rope","FlexTrack Yoga Mat","TurboRacket","WaveRider Surfboard","CoreStrength Dumbbells"],
-    "Toys": ["BuildPro Blocks","RoboBuddy Bot","MagicPuzzle Cube","SpeedDrift Car","AeroPlane Toy","GigaBear Plush","DinoQuest Figure","BrainBoost Game"],
-    "Home": ["GlowLite Lamp","PureAir Diffuser","ComfyCotton Pillow","DreamWeave Blanket","SmartTemp Fan","AromaCandle Set","CosyMat Rug","BreezeCurtains"]
+    "Electronics":["AeroSound Earbuds","VoltPro Power Bank","LumaScreen Monitor","EchoBeam Speaker","NovaCharge Cable","PulseSmart Watch","ByteTab Tablet","ZenBud Earphones"],
+    "Stationery":["CloudPen Gel","TaskMaster Planner","SketchPro Marker","SharpEdge Scissors","Inkwell Fountain Pen","UltraNote Pad","PaperMate Journal","FlexiRuler 30cm"],
+    "Accessories":["UrbanFlow Backpack","SnapGrip Wallet","SolarTime Watch","PureLeather Belt","KeyMate Organizer","ComfyCap Hat","PolarShades Glasses","TrendyCase Cover"],
+    "Clothing":["AeroFit T-shirt","BreezeJog Pants","ComfyCrew Hoodie","StreetWave Jacket","CoolStride Socks","UrbanWalk Shoes","DailyFit Shorts","AquaGuard Raincoat"],
+    "Kitchen":["AquaBlend Mixer","ChefMate Knife Set","SteamEase Kettle","SmartPan Fryer","EcoCut Board","PureTaste Mug","QuickPrep Blender","SpiceJoy Rack"],
+    "Sports":["SwiftRun Shoes","PowerGrip Gloves","HydroFlex Bottle","StaminaPro Rope","FlexTrack Yoga Mat","TurboRacket","WaveRider Surfboard","CoreStrength Dumbbells"],
+    "Toys":["BuildPro Blocks","RoboBuddy Bot","MagicPuzzle Cube","SpeedDrift Car","AeroPlane Toy","GigaBear Plush","DinoQuest Figure","BrainBoost Game"],
+    "Home":["GlowLite Lamp","PureAir Diffuser","ComfyCotton Pillow","DreamWeave Blanket","SmartTemp Fan","AromaCandle Set","CosyMat Rug","BreezeCurtains"]
 }
 
 # ---------------------------
@@ -108,12 +107,10 @@ def generate_products(num_items=NUM_ITEMS):
             img=f"https://picsum.photos/seed/{cat}{id_counter}/400/400"
             products.append({"id":f"item-{id_counter}","name":name,"category":cat,"price":price,"image":img})
             id_counter+=1
-            if id_counter>num_items:
-                break
+            if id_counter>num_items: break
     return products
 
-if 'products' not in st.session_state:
-    st.session_state['products']=generate_products()
+if 'products' not in st.session_state: st.session_state['products']=generate_products()
 PRODUCTS=st.session_state['products']
 
 # ---------------------------
@@ -122,15 +119,23 @@ PRODUCTS=st.session_state['products']
 if 'cart' not in st.session_state: st.session_state['cart']=[]
 if 'coupon' not in st.session_state: st.session_state['coupon']=""
 if 'pro' not in st.session_state: st.session_state['pro']=False
+if 'cart_open' not in st.session_state: st.session_state['cart_open']=False
 
 def add_to_cart(product_id,qty=1):
     prod=next((p for p in PRODUCTS if p['id']==product_id),None)
     if not prod: return
     entry=next((e for e in st.session_state['cart'] if e['id']==product_id),None)
-    if entry:
-        entry['qty']+=qty
+    if entry: entry['qty']+=qty
+    else: st.session_state['cart'].append({"id":prod['id'],"name":prod['name'],"price":prod['price'],"qty":qty})
+
+def remove_from_cart(product_id):
+    st.session_state['cart']=[e for e in st.session_state['cart'] if e['id']!=product_id]
+
+def update_qty(product_id,qty):
+    if qty<=0: remove_from_cart(product_id)
     else:
-        st.session_state['cart'].append({"id":prod['id'],"name":prod['name'],"price":prod['price'],"qty":qty})
+        for e in st.session_state['cart']:
+            if e['id']==product_id: e['qty']=qty
 
 def summarize_cart():
     subtotal=sum(e['price']*e['qty'] for e in st.session_state['cart'])
@@ -146,15 +151,28 @@ def summarize_cart():
 # TOP CART BAR
 # ---------------------------
 cs=summarize_cart()
-st.markdown(f"""
-<div class="top-cart-bar">
-    <div>🛍️ Mega Store — All Products ({len(PRODUCTS)})</div>
-    <div>
-        Cart: {len(st.session_state['cart'])} items • Total: ${cs['total']}
-        <button onclick="window.scrollTo(0,0)">🛒 View/Checkout</button>
-    </div>
-</div>
-""",unsafe_allow_html=True)
+if st.button(f"🛒 Cart ({len(st.session_state['cart'])} items) - Total: ${cs['total']}"):
+    st.session_state['cart_open'] = not st.session_state['cart_open']
+
+# ---------------------------
+# CART EXPANDER
+# ---------------------------
+if st.session_state['cart_open']:
+    with st.expander(f"🛒 Your Cart ({len(st.session_state['cart'])} items)", expanded=True):
+        if not st.session_state['cart']: st.info("Cart is empty")
+        else:
+            for item in st.session_state['cart']:
+                col1,col2,col3=st.columns([3,2,1])
+                col1.write(item['name'])
+                col2.number_input("Qty",min_value=1,value=item['qty'],key=f"cart_qty_{item['id']}",on_change=lambda id=item['id']: update_qty(id, st.session_state[f"cart_qty_{id}"]))
+                col3.button("Remove",key=f"cart_rem_{item['id']}",on_click=lambda id=item['id']: remove_from_cart(id))
+            cs=summarize_cart()
+            st.write(f"Subtotal: ${cs['subtotal']}")
+            st.write(f"Discount: -${cs['discount']}")
+            st.write(f"Tax: ${cs['tax']}")
+            st.write(f"Shipping: ${cs['shipping']}")
+            st.markdown(f"**Total: ${cs['total']}**")
+            st.button("Checkout ✅",on_click=lambda: st.session_state['cart'].clear())
 
 # ---------------------------
 # FILTERS
@@ -192,19 +210,3 @@ for prod in filtered:
         st.markdown("</div>",unsafe_allow_html=True)
     col_idx=(col_idx+1)%COLUMNS
     if col_idx==0: columns=st.columns(COLUMNS)
-
-# ---------------------------
-# CART SUMMARY
-# ---------------------------
-st.markdown("---")
-st.markdown("### 🧾 Cart Summary")
-cs=summarize_cart()
-st.write(f"Items in Cart: {len(st.session_state['cart'])}")
-st.write(f"Subtotal: ${cs['subtotal']}")
-st.write(f"Discount: -${cs['discount']}")
-st.write(f"Tax: ${cs['tax']}")
-st.write(f"Shipping: ${cs['shipping']}")
-st.markdown(f"**Total: ${cs['total']}**")
-if st.button("Checkout ✅"):
-    st.success("Order placed successfully!")
-    st.session_state['cart']=[]
