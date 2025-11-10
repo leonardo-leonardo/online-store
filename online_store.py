@@ -6,56 +6,83 @@ st.set_page_config(page_title="🛒 Common Store", layout="wide")
 st.markdown("<h1 style='text-align:center;'>🏪 Common Store</h1>", unsafe_allow_html=True)
 st.markdown("---")
 
-# --- DATA SETUP ---
-categories = [
-    "Electronics", "Stationery", "Accessories", "Clothing",
-    "Kitchen", "Sports", "Toys", "Home"
-]
+# --- CATEGORY IMAGE KEYWORDS ---
+category_images = {
+    "Electronics": "electronics,gadgets,tech",
+    "Stationery": "stationery,notebook,pen",
+    "Accessories": "wallet,watch,belt",
+    "Clothing": "clothing,tshirt,jacket,fashion",
+    "Kitchen": "kitchen,utensils,appliances",
+    "Sports": "sports,fitness,gear",
+    "Toys": "toy,lego,plush",
+    "Home": "home,decor,interior"
+}
 
-# Generate 100 products with unique images
+categories = list(category_images.keys())
+
+# --- PRODUCT NAME POOLS ---
+product_names = {
+    "Electronics": [
+        "AeroSound Earbuds", "VoltPro Power Bank", "LumaScreen Monitor", "EchoBeam Speaker",
+        "NovaCharge Cable", "PulseSmart Watch", "ByteTab Tablet", "ZenBud Earphones",
+        "NeoCharge Adapter", "SkyLink Router", "TrueBass Headset", "VisionPro Projector"
+    ],
+    "Stationery": [
+        "CloudPen Gel", "TaskMaster Planner", "SketchPro Marker Set", "SharpEdge Scissors",
+        "Inkwell Fountain Pen", "UltraNote Pad", "PaperMate Journal", "FlexiRuler 30cm",
+        "SmoothWrite Pencil Set", "DoodleSketch Pad", "ProWriter Pen", "Notely Binder"
+    ],
+    "Accessories": [
+        "UrbanFlow Backpack", "SnapGrip Wallet", "SolarTime Watch", "PureLeather Belt",
+        "KeyMate Organizer", "ComfyCap Hat", "PolarShades Glasses", "TrendyCase Phone Cover",
+        "LuxeBag Tote", "SmartStrap Watch", "MetroBuckle Belt", "ZenCase Laptop Sleeve"
+    ],
+    "Clothing": [
+        "AeroFit T-shirt", "BreezeJog Pants", "ComfyCrew Hoodie", "StreetWave Jacket",
+        "CoolStride Socks", "UrbanWalk Shoes", "DailyFit Shorts", "AquaGuard Raincoat",
+        "PureCotton Tee", "FlexRun Leggings", "HikePro Jacket", "DreamWear Hoodie"
+    ],
+    "Kitchen": [
+        "AquaBlend Mixer", "ChefMate Knife Set", "SteamEase Kettle", "SmartPan Fryer",
+        "EcoCut Board", "PureTaste Mug", "QuickPrep Blender", "SpiceJoy Rack",
+        "GlassEase Cup Set", "SmoothWhip Mixer", "CrispyBake Tray", "PureChef Pot Set"
+    ],
+    "Sports": [
+        "SwiftRun Shoes", "PowerGrip Gloves", "HydroFlex Bottle", "StaminaPro Rope",
+        "FlexTrack Yoga Mat", "TurboTennis Racket", "WaveRider Surfboard", "CoreStrength Dumbbells",
+        "FastKick Football", "BalanceStep Board", "RideMax Helmet", "ProPulse Bike Gloves"
+    ],
+    "Toys": [
+        "BuildPro Blocks", "RoboBuddy Bot", "MagicPuzzle Cube", "SpeedDrift Car",
+        "AeroPlane Toy", "GigaBear Plush", "DinoQuest Figure", "BrainBoost Game",
+        "RocketFun Launcher", "MiniCity Set", "MegaTrain Toy", "ColorSpin Puzzle"
+    ],
+    "Home": [
+        "GlowLite Lamp", "PureAir Diffuser", "ComfyCotton Pillow", "DreamWeave Blanket",
+        "SmartTemp Fan", "AromaCandle Set", "CosyMat Rug", "BreezeCurtains",
+        "PureWash Towels", "HavenDecor Frame", "FreshMist Diffuser", "WarmGlow Lamp"
+    ]
+}
+
+# --- GENERATE ITEMS ---
 def generate_items():
     items = []
-    for i in range(1, 101):
-        cat = random.choice(categories)
-        name = {
-            "Electronics": [
-                "AeroSound Earbuds", "VoltPro Power Bank", "ZenScreen Monitor", "EchoBeam Speaker",
-                "NovaCharge Cable", "LumaPhone Stand", "PulseSmart Watch", "ByteBook Tablet"
-            ],
-            "Stationery": [
-                "Bamboo Notebook", "CloudPen Gel", "UltraNote Pad", "SketchPro Marker Set",
-                "SharpEdge Scissors", "Inkwell Fountain Pen", "TaskMaster Planner", "FlexiRuler 30cm"
-            ],
-            "Accessories": [
-                "UrbanFlow Backpack", "SnapGrip Wallet", "SolarTime Watch", "PureLeather Belt",
-                "KeyMate Organizer", "ComfyCap", "PolarShades Glasses", "TrendyCase Phone Cover"
-            ],
-            "Clothing": [
-                "AeroFit T-shirt", "BreezeJog Pants", "ComfyCrew Hoodie", "StreetWave Jacket",
-                "CoolStride Socks", "UrbanWalk Shoes", "DailyFit Shorts", "AquaGuard Raincoat"
-            ],
-            "Kitchen": [
-                "AquaBlend Mixer", "ChefMate Knife Set", "SteamEase Kettle", "SmartPan Fryer",
-                "EcoCut Chopping Board", "PureTaste Mug", "QuickPrep Blender", "SpiceJoy Rack"
-            ],
-            "Sports": [
-                "SwiftRun Shoes", "PowerGrip Gloves", "HydroFlex Bottle", "StaminaPro Rope",
-                "FlexTrack Yoga Mat", "TurboTennis Racket", "WaveRider Surfboard", "CoreStrength Dumbbells"
-            ],
-            "Toys": [
-                "BuildPro Blocks", "RoboBuddy", "MagicPuzzle Cube", "SpeedDrift Car",
-                "AeroPlane Set", "GigaBear Plush", "DinoQuest Figure", "BrainBoost Game"
-            ],
-            "Home": [
-                "GlowLite Lamp", "PureAir Diffuser", "ComfyCotton Pillow", "DreamWeave Blanket",
-                "SmartTemp Fan", "AromaCandle Set", "CosyMat Rug", "BreezeCurtains"
-            ]
-        }[cat]
-        product_name = random.choice(name)
-        price = round(random.uniform(5, 200), 2)
-        img_url = f"https://picsum.photos/seed/{i}/400/400"
-        items.append({"id": i, "name": product_name, "category": cat, "price": price, "image": img_url})
-    return items
+    id_counter = 1
+    for cat in categories:
+        for name in random.sample(product_names[cat], len(product_names[cat])):
+            if id_counter > 100:
+                break
+            price = round(random.uniform(8, 250), 2)
+            img_url = f"https://source.unsplash.com/400x400/?{category_images[cat]}"
+            items.append({
+                "id": id_counter,
+                "name": name,
+                "category": cat,
+                "price": price,
+                "image": img_url
+            })
+            id_counter += 1
+    return items[:100]
 
 items = generate_items()
 
@@ -97,8 +124,8 @@ tab1, tab2, tab3 = st.tabs(["🛍️ Browse", "🧾 Cart", "⚙️ Admin"])
 # --- TAB 1: Browse ---
 with tab1:
     st.subheader("🛍️ Browse Products")
-    selected_category = st.selectbox("Filter by Category", ["All"] + categories, key="category_select")
-    search = st.text_input("Search by name", key="search")
+    selected_category = st.selectbox("Filter by Category", ["All"] + categories)
+    search = st.text_input("Search by name")
 
     filtered_items = [
         item for item in items
@@ -106,21 +133,18 @@ with tab1:
         and (search.lower() in item["name"].lower())
     ]
 
-    # Show items in grid
     cols = st.columns(4)
-    col_index = 0
-
+    idx = 0
     for item in filtered_items:
-        with cols[col_index]:
+        with cols[idx]:
             st.markdown(
                 f"""
                 <div style='
                     border-radius: 12px;
                     padding: 10px;
-                    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+                    background: linear-gradient(145deg, #ffffff, #f5f5f5);
                     box-shadow: 0 3px 8px rgba(0,0,0,0.1);
                     text-align: center;
-                    transition: transform 0.2s ease-in-out;
                 '>
                     <img src="{item['image']}" width="100%" style="border-radius:10px;">
                     <h5>{item['name']}</h5>
@@ -130,8 +154,8 @@ with tab1:
                 """, unsafe_allow_html=True)
             if st.button(f"Add 🛒 {item['id']}", key=f"add_{item['id']}"):
                 add_to_cart(item)
-        col_index = (col_index + 1) % 4
-        if col_index == 0:
+        idx = (idx + 1) % 4
+        if idx == 0:
             cols = st.columns(4)
 
 # --- TAB 2: Cart ---
@@ -161,6 +185,5 @@ with tab2:
 # --- TAB 3: Admin ---
 with tab3:
     st.subheader("⚙️ Admin Tools")
-    st.write("Manage product data or verify price list.")
     if st.checkbox("Show full product list"):
         st.dataframe(items)
