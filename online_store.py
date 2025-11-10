@@ -3,7 +3,8 @@ import random
 
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="🛒 Common Store", layout="wide")
-st.title("🏪 Common Store")
+st.markdown("<h1 style='text-align:center;'>🏪 Common Store</h1>", unsafe_allow_html=True)
+st.markdown("---")
 
 # --- DATA SETUP ---
 categories = [
@@ -11,7 +12,7 @@ categories = [
     "Kitchen", "Sports", "Toys", "Home"
 ]
 
-# Generate 100 named products with prices and working placeholder images
+# Generate 100 products with unique images
 def generate_items():
     items = []
     for i in range(1, 101):
@@ -52,42 +53,33 @@ def generate_items():
         }[cat]
         product_name = random.choice(name)
         price = round(random.uniform(5, 200), 2)
-
-        # Reliable placeholder image from picsum.photos (always loads)
         img_url = f"https://picsum.photos/seed/{i}/400/400"
-
-        items.append({
-            "id": i,
-            "name": product_name,
-            "category": cat,
-            "price": price,
-            "image": img_url
-        })
+        items.append({"id": i, "name": product_name, "category": cat, "price": price, "image": img_url})
     return items
 
 items = generate_items()
 
-# --- SESSION STATE ---
-if "cart" not in st.session_state:
-    st.session_state.cart = []
-if "coupon" not in st.session_state:
-    st.session_state.coupon = ""
-if "pro" not in st.session_state:
-    st.session_state.pro = False
+# --- SAFE SESSION STATE INIT ---
+if "cart" not in st.session_state or not isinstance(st.session_state.get("cart"), list):
+    st.session_state["cart"] = []
+if "coupon" not in st.session_state or not isinstance(st.session_state.get("coupon"), str):
+    st.session_state["coupon"] = ""
+if "pro" not in st.session_state or not isinstance(st.session_state.get("pro"), bool):
+    st.session_state["pro"] = False
 
 # --- FUNCTIONS ---
 def add_to_cart(item):
-    st.session_state.cart.append(item)
+    if "cart" not in st.session_state or not isinstance(st.session_state.get("cart"), list):
+        st.session_state["cart"] = []
+    st.session_state["cart"].append(item)
 
 def summarize_cart(cart, coupon, pro):
     subtotal = sum(i["price"] for i in cart)
     discount = 0
-
     if coupon == "SAVE10":
         discount += subtotal * 0.10
     if pro:
         discount += subtotal * 0.05
-
     tax = (subtotal - discount) * 0.05
     shipping = 0 if subtotal > 100 else 5
     total = subtotal - discount + tax + shipping
@@ -99,25 +91,44 @@ def summarize_cart(cart, coupon, pro):
         "total": round(total, 2)
     }
 
-# --- UI ---
+# --- TABS ---
 tab1, tab2, tab3 = st.tabs(["🛍️ Browse", "🧾 Cart", "⚙️ Admin"])
 
 # --- TAB 1: Browse ---
 with tab1:
-    st.subheader("Browse Products")
-    selected_category = st.selectbox("Filter by Category", ["All"] + categories)
+    st.subheader("🛍️ Browse Products")
+    selected_category = st.selectbox("Filter by Category", ["All"] + categories, key="category_select")
+    search = st.text_input("Search by name", key="search")
 
+    filtered_items = [
+        item for item in items
+        if (selected_category == "All" or item["category"] == selected_category)
+        and (search.lower() in item["name"].lower())
+    ]
+
+    # Show items in grid
     cols = st.columns(4)
     col_index = 0
 
-    for item in items:
-        if selected_category != "All" and item["category"] != selected_category:
-            continue
+    for item in filtered_items:
         with cols[col_index]:
-            st.image(item["image"], use_container_width=True)
-            st.markdown(f"**{item['name']}**")
-            st.caption(f"{item['category']} | ${item['price']}")
-            if st.button(f"Add to Cart 🛒 {item['id']}", key=f"add_{item['id']}"):
+            st.markdown(
+                f"""
+                <div style='
+                    border-radius: 12px;
+                    padding: 10px;
+                    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+                    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+                    text-align: center;
+                    transition: transform 0.2s ease-in-out;
+                '>
+                    <img src="{item['image']}" width="100%" style="border-radius:10px;">
+                    <h5>{item['name']}</h5>
+                    <p style='color:gray;font-size:14px;'>{item['category']}</p>
+                    <h4 style='color:#0a84ff;'>${item['price']}</h4>
+                </div>
+                """, unsafe_allow_html=True)
+            if st.button(f"Add 🛒 {item['id']}", key=f"add_{item['id']}"):
                 add_to_cart(item)
         col_index = (col_index + 1) % 4
         if col_index == 0:
@@ -125,13 +136,12 @@ with tab1:
 
 # --- TAB 2: Cart ---
 with tab2:
-    st.subheader("Your Cart")
+    st.subheader("🧾 Your Cart")
     if not st.session_state.cart:
-        st.info("Your cart is empty. Go to Browse tab to add items.")
+        st.info("Your cart is empty. Add some products from the Browse tab!")
     else:
         for c in st.session_state.cart:
             st.write(f"🛒 {c['name']} — ${c['price']}")
-
         st.text_input("Enter Coupon (SAVE10 for 10% off)", key="coupon")
         st.checkbox("Pro Member (5% extra off)", key="pro")
 
@@ -150,7 +160,7 @@ with tab2:
 
 # --- TAB 3: Admin ---
 with tab3:
-    st.subheader("Admin Tools")
-    st.write("Adjust pricing or inspect current product list.")
-    if st.checkbox("Show all items"):
+    st.subheader("⚙️ Admin Tools")
+    st.write("Manage product data or verify price list.")
+    if st.checkbox("Show full product list"):
         st.dataframe(items)
