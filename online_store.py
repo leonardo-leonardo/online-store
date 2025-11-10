@@ -4,8 +4,8 @@ import random
 # ---------------------------
 # PAGE CONFIG
 # ---------------------------
-st.set_page_config(page_title="🛒 Mega Store (NT$)", layout="wide", page_icon="🛍️")
-NUM_ITEMS = 300
+st.set_page_config(page_title="🛒 Mega Store NT$", layout="wide", page_icon="🛍️")
+NUM_ITEMS = 200
 COLUMNS = 4
 
 # ---------------------------
@@ -68,15 +68,26 @@ st.markdown("""
 # ---------------------------
 CATEGORIES = ["Electronics", "Stationery", "Accessories", "Clothing", "Kitchen", "Sports", "Toys", "Home"]
 
+IMAGE_URLS = {
+    "Electronics": "https://images.pexels.com/photos/788946/pexels-photo-788946.jpeg",
+    "Stationery": "https://images.pexels.com/photos/4144923/pexels-photo-4144923.jpeg",
+    "Accessories": "https://images.pexels.com/photos/322207/pexels-photo-322207.jpeg",
+    "Clothing": "https://images.pexels.com/photos/2983464/pexels-photo-2983464.jpeg",
+    "Kitchen": "https://images.pexels.com/photos/2762247/pexels-photo-2762247.jpeg",
+    "Sports": "https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg",
+    "Toys": "https://images.pexels.com/photos/3662663/pexels-photo-3662663.jpeg",
+    "Home": "https://images.pexels.com/photos/1571459/pexels-photo-1571459.jpeg",
+}
+
 NAME_POOLS = {
-    "Electronics": ["AeroSound Earbuds", "VoltPro Power Bank", "LumaScreen Monitor", "EchoBeam Speaker", "NovaCharge Cable", "PulseSmart Watch", "ByteTab Tablet", "ZenBud Earphones"],
-    "Stationery": ["CloudPen Gel", "TaskMaster Planner", "SketchPro Marker", "SharpEdge Scissors", "Inkwell Fountain Pen", "UltraNote Pad", "PaperMate Journal", "FlexiRuler 30cm"],
-    "Accessories": ["UrbanFlow Backpack", "SnapGrip Wallet", "SolarTime Watch", "PureLeather Belt", "KeyMate Organizer", "ComfyCap Hat", "PolarShades Glasses", "TrendyCase Cover"],
-    "Clothing": ["AeroFit T-shirt", "BreezeJog Pants", "ComfyCrew Hoodie", "StreetWave Jacket", "CoolStride Socks", "UrbanWalk Shoes", "DailyFit Shorts", "AquaGuard Raincoat"],
-    "Kitchen": ["AquaBlend Mixer", "ChefMate Knife Set", "SteamEase Kettle", "SmartPan Fryer", "EcoCut Board", "PureTaste Mug", "QuickPrep Blender", "SpiceJoy Rack"],
-    "Sports": ["SwiftRun Shoes", "PowerGrip Gloves", "HydroFlex Bottle", "StaminaPro Rope", "FlexTrack Yoga Mat", "TurboRacket", "WaveRider Surfboard", "CoreStrength Dumbbells"],
-    "Toys": ["BuildPro Blocks", "RoboBuddy Bot", "MagicPuzzle Cube", "SpeedDrift Car", "AeroPlane Toy", "GigaBear Plush", "DinoQuest Figure", "BrainBoost Game"],
-    "Home": ["GlowLite Lamp", "PureAir Diffuser", "ComfyCotton Pillow", "DreamWeave Blanket", "SmartTemp Fan", "AromaCandle Set", "CosyMat Rug", "BreezeCurtains"]
+    "Electronics": ["VoltPro Charger", "EchoBeam Speaker", "NovaScreen Monitor", "PulseSmart Watch", "AeroBuds Earphones", "ByteTab Tablet", "SkyCam Drone", "PowerLink Cable"],
+    "Stationery": ["CloudPen Gel", "TaskMaster Planner", "Inkwell Fountain Pen", "UltraNote Pad", "PaperMate Journal", "SketchPro Marker", "SharpEdge Scissors"],
+    "Accessories": ["UrbanFlow Backpack", "SnapGrip Wallet", "SolarTime Watch", "PureLeather Belt", "KeyMate Organizer", "ComfyCap Hat", "PolarShades Glasses"],
+    "Clothing": ["AeroFit T-shirt", "BreezeJog Pants", "ComfyCrew Hoodie", "StreetWave Jacket", "UrbanWalk Shoes", "DailyFit Shorts"],
+    "Kitchen": ["AquaBlend Mixer", "ChefMate Knife Set", "SteamEase Kettle", "SmartPan Fryer", "PureTaste Mug", "SpiceJoy Rack"],
+    "Sports": ["SwiftRun Shoes", "PowerGrip Gloves", "HydroFlex Bottle", "StaminaPro Rope", "FlexTrack Yoga Mat", "CoreStrength Dumbbells"],
+    "Toys": ["BuildPro Blocks", "RoboBuddy Bot", "MagicPuzzle Cube", "SpeedDrift Car", "AeroPlane Toy", "GigaBear Plush"],
+    "Home": ["GlowLite Lamp", "PureAir Diffuser", "ComfyCotton Pillow", "DreamWeave Blanket", "SmartTemp Fan", "AromaCandle Set"]
 }
 
 def generate_products(num_items=NUM_ITEMS):
@@ -85,10 +96,10 @@ def generate_products(num_items=NUM_ITEMS):
     while len(products) < num_items:
         for cat in CATEGORIES:
             base = random.choice(NAME_POOLS[cat])
-            variant = random.choice(["", " Pro", " Mini", " X", " Plus"])
+            variant = random.choice(["", " Mini", " Pro", " X", " Plus"])
             name = base + variant
-            price = int(random.uniform(300, 8000) * 0.85)  # discounted realistic NTD
-            img = f"https://source.unsplash.com/400x400/?{cat.lower()},{base.split()[0]}"
+            price = int(random.uniform(200, 7000) * 0.85)  # cheaper realistic NT$
+            img = IMAGE_URLS[cat]
             products.append({
                 "id": f"item-{id_counter}",
                 "name": name,
@@ -138,7 +149,7 @@ def summarize_cart():
     return {"subtotal": subtotal, "discount": discount, "tax": tax, "shipping": shipping, "total": total}
 
 # ---------------------------
-# TOP CART BAR
+# TOP BAR
 # ---------------------------
 cs = summarize_cart()
 st.markdown(f"""
@@ -183,7 +194,7 @@ st.markdown("### 🔍 Filters")
 search = st.text_input("Search products")
 category = st.selectbox("Category", ["All"] + CATEGORIES)
 
-# --- Fixed slider (INT safe) ---
+# --- Safe Price Slider ---
 if PRODUCTS:
     max_price_val = int(max(p['price'] for p in PRODUCTS))
 else:
