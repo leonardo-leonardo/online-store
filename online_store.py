@@ -2,19 +2,19 @@ import streamlit as st
 import random
 
 # ---------------------------
-# CONFIG
+# PAGE CONFIG
 # ---------------------------
 st.set_page_config(page_title="🛒 Mega Store (NT$)", layout="wide", page_icon="🛍️")
 NUM_ITEMS = 300
 COLUMNS = 4
 
 # ---------------------------
-# CSS STYLE
+# CSS
 # ---------------------------
 st.markdown("""
 <style>
 .product-card {
-  background: #ffffff;
+  background: #fff;
   border-radius: 12px;
   padding: 10px;
   box-shadow: 0 3px 8px rgba(0,0,0,0.08);
@@ -64,7 +64,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ---------------------------
-# PRODUCT DATA
+# DATA
 # ---------------------------
 CATEGORIES = ["Electronics", "Stationery", "Accessories", "Clothing", "Kitchen", "Sports", "Toys", "Home"]
 
@@ -107,7 +107,7 @@ if 'products' not in st.session_state:
 PRODUCTS = st.session_state['products']
 
 # ---------------------------
-# CART STATE
+# CART
 # ---------------------------
 if 'cart' not in st.session_state:
     st.session_state['cart'] = []
@@ -143,15 +143,12 @@ def summarize_cart():
 cs = summarize_cart()
 st.markdown(f"""
 <div class="top-cart-bar">
-  <div><b>🛍️ Mega Store NT$</b> — {len(PRODUCTS)} Items Available</div>
+  <div><b>🛍️ Mega Store NT$</b> — {len(PRODUCTS)} Items</div>
   <button class="add-btn" onclick="window.location.reload()">🔄 Refresh</button>
-  <button class="add-btn" onclick="window.dispatchEvent(new CustomEvent('toggleCart'))">
-    🛒 Cart ({len(st.session_state['cart'])}) — NT${int(cs['total'])}
-  </button>
+  <button class="add-btn">🛒 Cart ({len(st.session_state['cart'])}) — NT${int(cs['total'])}</button>
 </div>
 """, unsafe_allow_html=True)
 
-# Toggle cart expander
 if st.button(f"🛒 View Cart ({len(st.session_state['cart'])})"):
     st.session_state['cart_open'] = not st.session_state['cart_open']
 
@@ -186,12 +183,19 @@ st.markdown("### 🔍 Filters")
 search = st.text_input("Search products")
 category = st.selectbox("Category", ["All"] + CATEGORIES)
 
+# --- Fixed slider (INT safe) ---
 if PRODUCTS:
-    max_price_val = max(p['price'] for p in PRODUCTS)
+    max_price_val = int(max(p['price'] for p in PRODUCTS))
 else:
     max_price_val = 5000
 
-min_price, max_price = st.slider("Price range (NT$)", 0.0, max_price_val, (0.0, max_price_val))
+min_price, max_price = st.slider(
+    "Price range (NT$)",
+    min_value=0,
+    max_value=max_price_val,
+    value=(0, max_price_val),
+    step=100
+)
 
 # ---------------------------
 # FILTER LOGIC
