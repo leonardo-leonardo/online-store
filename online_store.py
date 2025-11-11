@@ -5,8 +5,6 @@ import random
 # PAGE CONFIG
 # ---------------------------
 st.set_page_config(page_title="🛒 Mega Store NT$", layout="wide", page_icon="🛍️")
-NUM_ITEMS = 200
-COLUMNS = 4
 
 # ---------------------------
 # CSS
@@ -64,59 +62,59 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ---------------------------
-# DATA
+# PRODUCT DATA
 # ---------------------------
-CATEGORIES = ["Electronics", "Stationery", "Accessories", "Clothing", "Kitchen", "Sports", "Toys", "Home"]
+PRODUCTS = [
+    # Electronics
+    {"name": "Wireless Earbuds", "category": "Electronics", "price": 890, "image": "https://images.pexels.com/photos/373945/pexels-photo-373945.jpeg"},
+    {"name": "Smart Watch", "category": "Electronics", "price": 1590, "image": "https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg"},
+    {"name": "Laptop", "category": "Electronics", "price": 18990, "image": "https://images.pexels.com/photos/18105/pexels-photo.jpg"},
+    {"name": "Bluetooth Speaker", "category": "Electronics", "price": 1290, "image": "https://images.pexels.com/photos/63703/speaker-portable-bluetooth-sound-63703.jpeg"},
+    {"name": "Power Bank", "category": "Electronics", "price": 690, "image": "https://images.pexels.com/photos/4386397/pexels-photo-4386397.jpeg"},
 
-# category → realistic photo keyword (Pexels CDN)
-CATEGORY_IMAGE_MAP = {
-    "Electronics": "https://images.pexels.com/photos/3945650/pexels-photo-3945650.jpeg",
-    "Stationery": "https://images.pexels.com/photos/4144221/pexels-photo-4144221.jpeg",
-    "Accessories": "https://images.pexels.com/photos/298864/pexels-photo-298864.jpeg",
-    "Clothing": "https://images.pexels.com/photos/2983464/pexels-photo-2983464.jpeg",
-    "Kitchen": "https://images.pexels.com/photos/4109990/pexels-photo-4109990.jpeg",
-    "Sports": "https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg",
-    "Toys": "https://images.pexels.com/photos/3671083/pexels-photo-3671083.jpeg",
-    "Home": "https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg",
-}
+    # Stationery
+    {"name": "Notebook", "category": "Stationery", "price": 120, "image": "https://images.pexels.com/photos/4144221/pexels-photo-4144221.jpeg"},
+    {"name": "Gel Pen", "category": "Stationery", "price": 35, "image": "https://images.pexels.com/photos/3727487/pexels-photo-3727487.jpeg"},
+    {"name": "Highlighter Set", "category": "Stationery", "price": 90, "image": "https://images.pexels.com/photos/5699475/pexels-photo-5699475.jpeg"},
+    {"name": "Sticky Notes", "category": "Stationery", "price": 60, "image": "https://images.pexels.com/photos/4712407/pexels-photo-4712407.jpeg"},
 
-NAME_POOLS = {
-    "Electronics": ["Wireless Earbuds", "Bluetooth Speaker", "LED Monitor", "Smart Watch", "Power Bank", "Laptop", "Charging Cable", "USB Flash Drive"],
-    "Stationery": ["Gel Pen", "Notebook", "Fountain Pen", "Highlighter Set", "Sticky Notes", "Sketchbook", "Binder Clips"],
-    "Accessories": ["Backpack", "Wallet", "Leather Belt", "Sunglasses", "Phone Case", "Keychain", "Necklace"],
-    "Clothing": ["T-shirt", "Jeans", "Jacket", "Sneakers", "Socks", "Hat", "Hoodie", "Dress"],
-    "Kitchen": ["Cooking Pot", "Frying Pan", "Ceramic Mug", "Kitchen Knife", "Toaster", "Blender", "Plate Set"],
-    "Sports": ["Running Shoes", "Yoga Mat", "Water Bottle", "Badminton Racket", "Dumbbell Set", "Football", "Swim Goggles"],
-    "Toys": ["Building Blocks", "Toy Car", "Doll", "Teddy Bear", "RC Drone", "Puzzle Cube", "Toy Train", "Board Game"],
-    "Home": ["Table Lamp", "Pillow", "Blanket", "Curtains", "Diffuser", "Candle Set", "Rug", "Fan"]
-}
+    # Accessories
+    {"name": "Backpack", "category": "Accessories", "price": 890, "image": "https://images.pexels.com/photos/1684075/pexels-photo-1684075.jpeg"},
+    {"name": "Wallet", "category": "Accessories", "price": 590, "image": "https://images.pexels.com/photos/1080628/pexels-photo-1080628.jpeg"},
+    {"name": "Sunglasses", "category": "Accessories", "price": 350, "image": "https://images.pexels.com/photos/46710/pexels-photo-46710.jpeg"},
+    {"name": "Leather Belt", "category": "Accessories", "price": 480, "image": "https://images.pexels.com/photos/165529/pexels-photo-165529.jpeg"},
 
-def generate_products(num_items=NUM_ITEMS):
-    products = []
-    id_counter = 1
-    while len(products) < num_items:
-        for cat in CATEGORIES:
-            base = random.choice(NAME_POOLS[cat])
-            variant = random.choice(["", " Pro", " Mini", " X", " Plus"])
-            name = base + variant
-            price = int(random.uniform(150, 7000) * 0.85)
-            image = CATEGORY_IMAGE_MAP.get(cat)
-            products.append({
-                "id": f"item-{id_counter}",
-                "name": name,
-                "category": cat,
-                "price": price,
-                "image": image
-            })
-            id_counter += 1
-            if len(products) >= num_items:
-                break
-    return products
+    # Clothing
+    {"name": "T-shirt", "category": "Clothing", "price": 250, "image": "https://images.pexels.com/photos/2983464/pexels-photo-2983464.jpeg"},
+    {"name": "Jeans", "category": "Clothing", "price": 780, "image": "https://images.pexels.com/photos/4041682/pexels-photo-4041682.jpeg"},
+    {"name": "Sneakers", "category": "Clothing", "price": 1190, "image": "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg"},
+    {"name": "Socks", "category": "Clothing", "price": 90, "image": "https://images.pexels.com/photos/1859483/pexels-photo-1859483.jpeg"},
+    {"name": "Jacket", "category": "Clothing", "price": 990, "image": "https://images.pexels.com/photos/1124465/pexels-photo-1124465.jpeg"},
 
-if 'products' not in st.session_state:
-    st.session_state['products'] = generate_products()
+    # Kitchen
+    {"name": "Ceramic Mug", "category": "Kitchen", "price": 180, "image": "https://images.pexels.com/photos/585750/pexels-photo-585750.jpeg"},
+    {"name": "Blender", "category": "Kitchen", "price": 1290, "image": "https://images.pexels.com/photos/4040675/pexels-photo-4040675.jpeg"},
+    {"name": "Frying Pan", "category": "Kitchen", "price": 590, "image": "https://images.pexels.com/photos/1435895/pexels-photo-1435895.jpeg"},
+    {"name": "Cooking Pot", "category": "Kitchen", "price": 820, "image": "https://images.pexels.com/photos/5638215/pexels-photo-5638215.jpeg"},
 
-PRODUCTS = st.session_state['products']
+    # Sports
+    {"name": "Running Shoes", "category": "Sports", "price": 1690, "image": "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg"},
+    {"name": "Yoga Mat", "category": "Sports", "price": 520, "image": "https://images.pexels.com/photos/4056723/pexels-photo-4056723.jpeg"},
+    {"name": "Water Bottle", "category": "Sports", "price": 240, "image": "https://images.pexels.com/photos/1546896/pexels-photo-1546896.jpeg"},
+    {"name": "Football", "category": "Sports", "price": 450, "image": "https://images.pexels.com/photos/47730/the-ball-stadion-football-the-pitch-47730.jpeg"},
+
+    # Toys
+    {"name": "Teddy Bear", "category": "Toys", "price": 390, "image": "https://images.pexels.com/photos/207891/pexels-photo-207891.jpeg"},
+    {"name": "Toy Car", "category": "Toys", "price": 160, "image": "https://images.pexels.com/photos/163743/pexels-photo-163743.jpeg"},
+    {"name": "Building Blocks", "category": "Toys", "price": 290, "image": "https://images.pexels.com/photos/163743/pexels-photo-163743.jpeg"},
+    {"name": "Board Game", "category": "Toys", "price": 450, "image": "https://images.pexels.com/photos/411207/pexels-photo-411207.jpeg"},
+
+    # Home
+    {"name": "Table Lamp", "category": "Home", "price": 480, "image": "https://images.pexels.com/photos/1121123/pexels-photo-1121123.jpeg"},
+    {"name": "Blanket", "category": "Home", "price": 620, "image": "https://images.pexels.com/photos/1454806/pexels-photo-1454806.jpeg"},
+    {"name": "Rug", "category": "Home", "price": 780, "image": "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg"},
+    {"name": "Candle Set", "category": "Home", "price": 360, "image": "https://images.pexels.com/photos/695970/pexels-photo-695970.jpeg"},
+]
 
 # ---------------------------
 # CART SYSTEM
@@ -127,15 +125,14 @@ if 'cart_open' not in st.session_state:
     st.session_state['cart_open'] = False
 
 def add_to_cart(pid, qty=1):
-    prod = next((p for p in PRODUCTS if p['id'] == pid), None)
+    prod = next((p for p in PRODUCTS if p['name'] == pid), None)
     if not prod:
         return
-    existing = next((c for c in st.session_state['cart'] if c['id'] == pid), None)
+    existing = next((c for c in st.session_state['cart'] if c['name'] == pid), None)
     if existing:
         existing['qty'] += qty
     else:
         st.session_state['cart'].append({
-            "id": pid,
             "name": prod['name'],
             "price": prod['price'],
             "qty": qty
@@ -150,7 +147,7 @@ def summarize_cart():
     return {"subtotal": subtotal, "discount": discount, "tax": tax, "shipping": shipping, "total": total}
 
 # ---------------------------
-# TOP BAR
+# UI - TOP BAR
 # ---------------------------
 cs = summarize_cart()
 st.markdown(f"""
@@ -172,11 +169,11 @@ if st.session_state['cart_open']:
             for item in st.session_state['cart']:
                 c1, c2, c3 = st.columns([3, 2, 1])
                 c1.write(item['name'])
-                qty = c2.number_input("Qty", 1, 99, item['qty'], key=f"qty_{item['id']}")
+                qty = c2.number_input("Qty", 1, 99, item['qty'], key=f"qty_{item['name']}")
                 if qty != item['qty']:
                     item['qty'] = qty
-                if c3.button("❌ Remove", key=f"rem_{item['id']}"):
-                    st.session_state['cart'] = [x for x in st.session_state['cart'] if x['id'] != item['id']]
+                if c3.button("❌ Remove", key=f"rem_{item['name']}"):
+                    st.session_state['cart'] = [x for x in st.session_state['cart'] if x['name'] != item['name']]
                     st.experimental_rerun()
             cs = summarize_cart()
             st.write(f"Subtotal: NT${int(cs['subtotal'])}")
@@ -193,21 +190,11 @@ if st.session_state['cart_open']:
 # ---------------------------
 st.markdown("### 🔍 Filters")
 search = st.text_input("Search products")
-category = st.selectbox("Category", ["All"] + CATEGORIES)
+category = st.selectbox("Category", ["All"] + sorted(list(set(p["category"] for p in PRODUCTS))))
+prices = [p['price'] for p in PRODUCTS]
+min_price, max_price = st.slider("Price range (NT$)", 0, int(max(prices)), (0, int(max(prices))), step=100)
 
-if PRODUCTS:
-    max_price_val = int(max(p['price'] for p in PRODUCTS))
-else:
-    max_price_val = 5000
-
-min_price, max_price = st.slider(
-    "Price range (NT$)",
-    min_value=0,
-    max_value=max_price_val,
-    value=(0, max_price_val),
-    step=100
-)
-
+# Filter logic
 filtered = PRODUCTS
 if search:
     filtered = [p for p in filtered if search.lower() in p['name'].lower()]
@@ -218,6 +205,7 @@ filtered = [p for p in filtered if min_price <= p['price'] <= max_price]
 # ---------------------------
 # DISPLAY PRODUCTS
 # ---------------------------
+COLUMNS = 4
 cols = st.columns(COLUMNS)
 i = 0
 for prod in filtered:
@@ -227,10 +215,10 @@ for prod in filtered:
         st.markdown(f"**{prod['name']}**")
         st.caption(prod['category'])
         st.markdown(f"<div class='price'>NT${prod['price']}</div>", unsafe_allow_html=True)
-        qty_key = f"q_{prod['id']}"
+        qty_key = f"q_{prod['name']}"
         qty = st.number_input("Qty", min_value=1, value=1, key=qty_key, label_visibility="collapsed")
-        if st.button("Add to Cart", key=f"add_{prod['id']}"):
-            add_to_cart(prod['id'], qty)
+        if st.button("Add to Cart", key=f"add_{prod['name']}"):
+            add_to_cart(prod['name'], qty)
             st.success(f"Added {qty} × {prod['name']} to cart.")
         st.markdown("</div>", unsafe_allow_html=True)
     i = (i + 1) % COLUMNS
