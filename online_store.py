@@ -1,26 +1,11 @@
-# convenience_store_50_final.py
+# convenience_store_10_final.py
 import streamlit as st
-import re
 
-st.set_page_config(page_title="🛒 Convenience Store (50 items)", layout="wide", page_icon="🛍️")
-
+st.set_page_config(page_title="🛒 Convenience Store (10 items)", layout="wide", page_icon="🛍️")
 COLUMNS = 4
 
 # ---------------------------
-# UTILITIES
-# ---------------------------
-def slugify(name: str) -> str:
-    s = name.lower()
-    s = re.sub(r"[^a-z0-9\s-]", "", s)
-    s = re.sub(r"\s+", "-", s.strip())
-    return s
-
-def placeholder_image_for(name: str) -> str:
-    slug = slugify(name)
-    return f"https://picsum.photos/seed/{slug}/600/400"
-
-# ---------------------------
-# PRODUCTS
+# PRODUCTS (only 10)
 # ---------------------------
 PRODUCTS = [
     {"id":"c001","name":"Classic Ballpoint Pen","category":"Stationery","price":25,
@@ -29,62 +14,21 @@ PRODUCTS = [
      "image":"https://th.bing.com/th/id/OIP.Slqd7KcvFd9qNHsZKyLnVQHaGP?o=7&cb=ucfimg2rm=3&ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3"},
     {"id":"c003","name":"Sticky Note Pack","category":"Stationery","price":60,
      "image":"https://th.bing.com/th/id/OIP.cwm_7SCYy0aBSS97RjAfNgHaFM?o=7&cb=ucfimg2rm=3&ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3"},
+    {"id":"c004","name":"Highlighter Set (4)","category":"Stationery","price":95,
+     "image":"https://th.bing.com/th/id/OIP.b_YQ1kPRO4PN4m1iFO5yFAHaHa?o=7&cb=ucfimg2rm=3&ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3"},
+    {"id":"c005","name":"Mechanical Pencil 0.5mm","category":"Stationery","price":85,
+     "image":"https://th.bing.com/th/id/OIP.Jq7xQPBZAXqs9xlz-Iw0fAHaHa?o=7&cb=ucfimg2rm=3&ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3"},
+    {"id":"c006","name":"Cozy Knit Socks (3 Pairs)","category":"Clothing","price":150,
+     "image":"https://tse1.mm.bing.net/th/id/OIP.zJb_59YSs8dS-yqhsxnSYwHaGT?cb=ucfimg2ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3"},
+    {"id":"c007","name":"Everyday Cotton T-shirt","category":"Clothing","price":280,
+     "image":"https://tse2.mm.bing.net/th/id/OIP.uOktto4M5ejy6b0RIiiNBAHaIc?cb=ucfimg2ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3"},
+    {"id":"c008","name":"Lightweight Windbreaker","category":"Clothing","price":990,
+     "image":"https://tse1.mm.bing.net/th/id/OIP.8W6syRyqiZN2RBwYykI3RwHaIo?cb=ucfimg2ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3"},
+    {"id":"c009","name":"Classic Baseball Cap","category":"Clothing","price":220,
+     "image":"https://tse1.mm.bing.net/th/id/OIP.gS2WiHOUyw5mV5cfU_R8qgHaHa?cb=ucfimg2ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3"},
+    {"id":"c010","name":"Comfort Flip-flops","category":"Clothing","price":180,
+     "image":"https://tse3.mm.bing.net/th/id/OIP.w0bIOKTROYzYouSxxSiuawHaE1?cb=ucfimg2ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3"},
 ]
-
-# Add remaining 47 products with placeholder images
-names_categories_prices = [
-    ("Highlighter Set (4)","Stationery",95),
-    ("Mechanical Pencil 0.5mm","Stationery",85),
-    ("Cozy Knit Socks (3 Pairs)","Clothing",150),
-    ("Everyday Cotton T-shirt","Clothing",280),
-    ("Lightweight Windbreaker","Clothing",990),
-    ("Classic Baseball Cap","Clothing",220),
-    ("Comfort Flip-flops","Clothing",180),
-    ("Insulated Travel Mug","Kitchen",420),
-    ("Ceramic Coffee Mug","Kitchen",180),
-    ("2-slice Toaster","Kitchen",990),
-    ("Chef's Spatula Set","Kitchen",240),
-    ("Non-stick Frypan 26cm","Kitchen",680),
-    ("USB-C Fast Charger","Electronics",390),
-    ("Compact Power Bank 10000mAh","Electronics",820),
-    ("Wireless Earbuds Basic","Electronics",990),
-    ("Portable Bluetooth Speaker","Electronics",1290),
-    ("LED Desk Lamp","Electronics",760),
-    ("Reusable Water Bottle 500ml","Home",260),
-    ("Scented Candle (3-pack)","Home",360),
-    ("Microfiber Dish Cloths (5)","Home",140),
-    ("Compact Storage Box","Home",320),
-    ("Soft Throw Blanket","Home",580),
-    ("Everyday Backpack 20L","Accessories",1490),
-    ("Slim Card Wallet","Accessories",420),
-    ("Travel Umbrella Compact","Accessories",320),
-    ("Key Organizer Multi-tool","Accessories",260),
-    ("Phone Case Clear Fit","Accessories",290),
-    ("Running Shoes Lightweight","Sports",1990),
-    ("Yoga Mat Non-slip","Sports",520),
-    ("Sports Sweatband","Sports",110),
-    ("Tennis Racket Beginner","Sports",1390),
-    ("Compact Jump Rope","Sports",210),
-    ("Kids Puzzle 100pcs","Toys",260),
-    ("Mini Remote Car","Toys",690),
-    ("Plush Teddy Bear Medium","Toys",420),
-    ("Coloring Crayon Pack","Toys",150),
-    ("Stacking Blocks Set","Toys",340),
-    ("Face Mask 50pcs","Health",250),
-    ("Hand Sanitizer 250ml","Health",180),
-    ("First Aid Compact Kit","Health",490),
-    ("Vitamin C Chewables","Health",320),
-    ("Thermal Reusable Ice Pack","Health",210),
-    ("Office Desk Calendar 2026","Stationery",240),
-    ("Rechargeable LED Keylight","Electronics",330),
-    ("Compact Sewing Kit","Home",140),
-    ("Portable Shoe Cleaning Kit","Home",200),
-    ("Reusable Grocery Tote (2)","Accessories",160)
-]
-
-for i, (name, cat, price) in enumerate(names_categories_prices):
-    pid = f"c{4+i:03d}"
-    PRODUCTS.append({"id":pid,"name":name,"category":cat,"price":price,"image":placeholder_image_for(name)})
 
 # ---------------------------
 # SESSION STATE
@@ -103,7 +47,7 @@ def add_to_cart(prod_id, qty=1):
 # ---------------------------
 # DISPLAY
 # ---------------------------
-st.title("🛒 Convenience Store (50 Items)")
+st.title("🛒 Convenience Store (10 Items)")
 
 # Cart summary
 total_items = sum(c['qty'] for c in st.session_state['cart'])
