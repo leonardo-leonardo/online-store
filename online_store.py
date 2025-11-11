@@ -1,6 +1,5 @@
 import streamlit as st
 import random
-import urllib.parse
 
 # ---------------------------
 # PAGE CONFIG
@@ -69,13 +68,25 @@ st.markdown("""
 # ---------------------------
 CATEGORIES = ["Electronics", "Stationery", "Accessories", "Clothing", "Kitchen", "Sports", "Toys", "Home"]
 
+# category → realistic photo keyword (Pexels CDN)
+CATEGORY_IMAGE_MAP = {
+    "Electronics": "https://images.pexels.com/photos/3945650/pexels-photo-3945650.jpeg",
+    "Stationery": "https://images.pexels.com/photos/4144221/pexels-photo-4144221.jpeg",
+    "Accessories": "https://images.pexels.com/photos/298864/pexels-photo-298864.jpeg",
+    "Clothing": "https://images.pexels.com/photos/2983464/pexels-photo-2983464.jpeg",
+    "Kitchen": "https://images.pexels.com/photos/4109990/pexels-photo-4109990.jpeg",
+    "Sports": "https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg",
+    "Toys": "https://images.pexels.com/photos/3671083/pexels-photo-3671083.jpeg",
+    "Home": "https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg",
+}
+
 NAME_POOLS = {
-    "Electronics": ["Wireless Earbuds", "Bluetooth Speaker", "LED Monitor", "Smart Watch", "Power Bank", "Charging Cable", "Laptop", "USB Flash Drive"],
-    "Stationery": ["Gel Pen", "Notebook", "Fountain Pen", "Highlighter Set", "Sticky Notes", "Mechanical Pencil", "Sketchbook", "Binder Clip Set"],
-    "Accessories": ["Backpack", "Wallet", "Wrist Watch", "Leather Belt", "Sunglasses", "Phone Case", "Keychain", "Necklace"],
+    "Electronics": ["Wireless Earbuds", "Bluetooth Speaker", "LED Monitor", "Smart Watch", "Power Bank", "Laptop", "Charging Cable", "USB Flash Drive"],
+    "Stationery": ["Gel Pen", "Notebook", "Fountain Pen", "Highlighter Set", "Sticky Notes", "Sketchbook", "Binder Clips"],
+    "Accessories": ["Backpack", "Wallet", "Leather Belt", "Sunglasses", "Phone Case", "Keychain", "Necklace"],
     "Clothing": ["T-shirt", "Jeans", "Jacket", "Sneakers", "Socks", "Hat", "Hoodie", "Dress"],
-    "Kitchen": ["Cooking Pot", "Frying Pan", "Cutting Board", "Ceramic Mug", "Kitchen Knife", "Toaster", "Blender", "Plate Set"],
-    "Sports": ["Running Shoes", "Yoga Mat", "Water Bottle", "Badminton Racket", "Dumbbell Set", "Football", "Basketball", "Swim Goggles"],
+    "Kitchen": ["Cooking Pot", "Frying Pan", "Ceramic Mug", "Kitchen Knife", "Toaster", "Blender", "Plate Set"],
+    "Sports": ["Running Shoes", "Yoga Mat", "Water Bottle", "Badminton Racket", "Dumbbell Set", "Football", "Swim Goggles"],
     "Toys": ["Building Blocks", "Toy Car", "Doll", "Teddy Bear", "RC Drone", "Puzzle Cube", "Toy Train", "Board Game"],
     "Home": ["Table Lamp", "Pillow", "Blanket", "Curtains", "Diffuser", "Candle Set", "Rug", "Fan"]
 }
@@ -88,15 +99,14 @@ def generate_products(num_items=NUM_ITEMS):
             base = random.choice(NAME_POOLS[cat])
             variant = random.choice(["", " Pro", " Mini", " X", " Plus"])
             name = base + variant
-            price = int(random.uniform(150, 7000) * 0.85)  # discounted NTD
-            keyword = urllib.parse.quote(f"{base} product isolated white background")
-            img = f"https://source.unsplash.com/400x400/?{keyword}"
+            price = int(random.uniform(150, 7000) * 0.85)
+            image = CATEGORY_IMAGE_MAP.get(cat)
             products.append({
                 "id": f"item-{id_counter}",
                 "name": name,
                 "category": cat,
                 "price": price,
-                "image": img
+                "image": image
             })
             id_counter += 1
             if len(products) >= num_items:
@@ -109,7 +119,7 @@ if 'products' not in st.session_state:
 PRODUCTS = st.session_state['products']
 
 # ---------------------------
-# CART
+# CART SYSTEM
 # ---------------------------
 if 'cart' not in st.session_state:
     st.session_state['cart'] = []
@@ -185,7 +195,6 @@ st.markdown("### 🔍 Filters")
 search = st.text_input("Search products")
 category = st.selectbox("Category", ["All"] + CATEGORIES)
 
-# --- Price Slider (safe int)
 if PRODUCTS:
     max_price_val = int(max(p['price'] for p in PRODUCTS))
 else:
@@ -199,9 +208,6 @@ min_price, max_price = st.slider(
     step=100
 )
 
-# ---------------------------
-# FILTER LOGIC
-# ---------------------------
 filtered = PRODUCTS
 if search:
     filtered = [p for p in filtered if search.lower() in p['name'].lower()]
@@ -210,7 +216,7 @@ if category != "All":
 filtered = [p for p in filtered if min_price <= p['price'] <= max_price]
 
 # ---------------------------
-# GRID DISPLAY
+# DISPLAY PRODUCTS
 # ---------------------------
 cols = st.columns(COLUMNS)
 i = 0
