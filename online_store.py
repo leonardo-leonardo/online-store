@@ -1,80 +1,143 @@
-# convenience_store_10_final.py
 import streamlit as st
 
-st.set_page_config(page_title="🛒 Convenience Store (10 items)", layout="wide", page_icon="🛍️")
-COLUMNS = 4
+# -------------------------
+# PAGE SETUP
+# -------------------------
+st.set_page_config(page_title="Online Store", layout="wide")
+st.title("🛍️ Online Store")
 
-# ---------------------------
-# PRODUCTS (only 10)
-# ---------------------------
-PRODUCTS = [
-    {"id":"c001","name":"Classic Ballpoint Pen","category":"Stationery","price":25,
-     "image":"https://th.bing.com/th/id/R.cb4aee1c689dbe892c081f77bed24ab4?rik=Ox67o%2b1d%2f7AQag&pid=ImgRaw&r=0"},
-    {"id":"c002","name":"Notebook A5 Ruled","category":"Stationery","price":120,
-     "image":"https://th.bing.com/th/id/OIP.Slqd7KcvFd9qNHsZKyLnVQHaGP?o=7&cb=ucfimg2rm=3&ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3"},
-    {"id":"c003","name":"Sticky Note Pack","category":"Stationery","price":60,
-     "image":"https://th.bing.com/th/id/OIP.cwm_7SCYy0aBSS97RjAfNgHaFM?o=7&cb=ucfimg2rm=3&ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3"},
-    {"id":"c004","name":"Highlighter Set (4)","category":"Stationery","price":95,
-     "image":"https://th.bing.com/th/id/OIP.b_YQ1kPRO4PN4m1iFO5yFAHaHa?o=7&cb=ucfimg2rm=3&ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3"},
-    {"id":"c005","name":"Mechanical Pencil 0.5mm","category":"Stationery","price":85,
-     "image":"https://th.bing.com/th/id/OIP.Jq7xQPBZAXqs9xlz-Iw0fAHaHa?o=7&cb=ucfimg2rm=3&ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3"},
-    {"id":"c006","name":"Cozy Knit Socks (3 Pairs)","category":"Clothing","price":150,
-     "image":"https://tse1.mm.bing.net/th/id/OIP.zJb_59YSs8dS-yqhsxnSYwHaGT?cb=ucfimg2ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3"},
-    {"id":"c007","name":"Everyday Cotton T-shirt","category":"Clothing","price":280,
-     "image":"https://tse2.mm.bing.net/th/id/OIP.uOktto4M5ejy6b0RIiiNBAHaIc?cb=ucfimg2ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3"},
-    {"id":"c008","name":"Lightweight Windbreaker","category":"Clothing","price":990,
-     "image":"https://tse1.mm.bing.net/th/id/OIP.8W6syRyqiZN2RBwYykI3RwHaIo?cb=ucfimg2ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3"},
-    {"id":"c009","name":"Classic Baseball Cap","category":"Clothing","price":220,
-     "image":"https://tse1.mm.bing.net/th/id/OIP.gS2WiHOUyw5mV5cfU_R8qgHaHa?cb=ucfimg2ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3"},
-    {"id":"c010","name":"Comfort Flip-flops","category":"Clothing","price":180,
-     "image":"https://tse3.mm.bing.net/th/id/OIP.w0bIOKTROYzYouSxxSiuawHaE1?cb=ucfimg2ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3"},
+# -------------------------
+# SESSION STATE (CART)
+# -------------------------
+if "cart" not in st.session_state:
+    st.session_state.cart = {}
+
+def add_to_cart(name, price):
+    if name in st.session_state.cart:
+        st.session_state.cart[name]["qty"] += 1
+    else:
+        st.session_state.cart[name] = {"price": price, "qty": 1}
+
+def clear_cart():
+    st.session_state.cart = {}
+
+# -------------------------
+# PRODUCT LIST (10 FINAL ITEMS)
+# -------------------------
+products = [
+    {
+        "name": "Classic Ballpoint Pen",
+        "price": 25,
+        "image": "https://th.bing.com/th/id/R.cb4aee1c689dbe892c081f77bed24ab4?rik=Ox67o%2b1d%2f7AQag&pid=ImgRaw&r=0",
+    },
+    {
+        "name": "Notebook A5 Ruled",
+        "price": 60,
+        "image": "https://th.bing.com/th/id/OIP.Slqd7KcvFd9qNHsZKyLnVQHaGP?rs=1&pid=ImgDetMain",
+    },
+    {
+        "name": "Sticky Note Pack",
+        "price": 35,
+        "image": "https://th.bing.com/th/id/OIP.cwm_7SCYy0aBSS97RjAfNgHaFM?rs=1&pid=ImgDetMain",
+    },
+    {
+        "name": "Highlighter Set (4)",
+        "price": 55,
+        "image": "https://th.bing.com/th/id/OIP.b_YQ1kPRO4PN4m1iFO5yFAHaHa?rs=1&pid=ImgDetMain",
+    },
+    {
+        "name": "Mechanical Pencil 0.5mm",
+        "price": 30,
+        "image": "https://th.bing.com/th/id/OIP.Jq7xQPBZAXqs9xlz-Iw0fAHaHa?rs=1&pid=ImgDetMain",
+    },
+    {
+        "name": "Cozy Knit Socks (3 Pairs)",
+        "price": 80,
+        "image": "https://tse1.mm.bing.net/th/id/OIP.zJb_59YSs8dS-yqhsxnSYwHaGT?rs=1&pid=ImgDetMain",
+    },
+    {
+        "name": "Everyday Cotton T-shirt",
+        "price": 120,
+        "image": "https://tse2.mm.bing.net/th/id/OIP.uOktto4M5ejy6b0RIiiNBAHaIc?rs=1&pid=ImgDetMain",
+    },
+    {
+        "name": "Lightweight Windbreaker",
+        "price": 250,
+        "image": "https://tse1.mm.bing.net/th/id/OIP.8W6syRyqiZN2RBwYykI3RwHaIo?rs=1&pid=ImgDetMain",
+    },
+    {
+        "name": "Classic Baseball Cap",
+        "price": 90,
+        "image": "https://tse1.mm.bing.net/th/id/OIP.gS2WiHOUyw5mV5cfU_R8qgHaHa?rs=1&pid=ImgDetMain",
+    },
+    {
+        "name": "Comfort Flip-flops",
+        "price": 70,
+        "image": "https://tse3.mm.bing.net/th/id/OIP.w0bIOKTROYzYouSxxSiuawHaE1?rs=1&pid=ImgDetMain",
+    },
 ]
 
-# ---------------------------
-# SESSION STATE
-# ---------------------------
-if 'cart' not in st.session_state: st.session_state['cart'] = []
+# -------------------------
+# CART SUMMARY DISPLAY
+# -------------------------
+total_items = sum(item["qty"] for item in st.session_state.cart.values())
+total_price = sum(item["qty"] * item["price"] for item in st.session_state.cart.values())
 
-def add_to_cart(prod_id, qty=1):
-    prod = next((p for p in PRODUCTS if p['id']==prod_id), None)
-    if not prod: return
-    found = next((c for c in st.session_state['cart'] if c['id']==prod_id), None)
-    if found:
-        found['qty'] += qty
+with st.expander(f"🛒 Cart ({total_items} items) - NT${total_price}", expanded=False):
+    if total_items == 0:
+        st.write("Your cart is empty.")
     else:
-        st.session_state['cart'].append({"id":prod_id,"name":prod['name'],"price":prod['price'],"qty":qty})
+        for name, info in st.session_state.cart.items():
+            st.write(f"**{name}** x {info['qty']} = NT${info['qty'] * info['price']}")
+        st.write("---")
+        if st.button("🧹 Clear Cart"):
+            clear_cart()
+            st.experimental_rerun()
 
-# ---------------------------
-# DISPLAY
-# ---------------------------
-st.title("🛒 Convenience Store (10 Items)")
+        # -------------------------
+        # CHECKOUT BUTTON
+        # -------------------------
+        if st.button("✅ Proceed to Checkout"):
+            st.session_state.checkout = True
 
-# Cart summary
-total_items = sum(c['qty'] for c in st.session_state['cart'])
-total_price = sum(c['qty']*c['price'] for c in st.session_state['cart'])
-st.sidebar.header(f"🛍️ Cart ({total_items} items) - NT${total_price}")
-with st.sidebar.expander("View Cart", expanded=True):
-    if st.session_state['cart']:
-        for c in st.session_state['cart']:
-            st.write(f"{c['name']} x {c['qty']} = NT${c['qty']*c['price']}")
+# -------------------------
+# CHECKOUT PAGE
+# -------------------------
+if "checkout" in st.session_state and st.session_state.checkout:
+    st.header("💳 Checkout")
+
+    if total_items == 0:
+        st.write("Your cart is empty.")
     else:
-        st.info("Cart is empty.")
+        st.subheader("Order Summary")
+        for name, info in st.session_state.cart.items():
+            st.write(f"{name} x {info['qty']} — NT${info['qty'] * info['price']}")
 
-# Filter
-search = st.text_input("Search products by name")
+        st.write(f"### **Total: NT${total_price}**")
 
-# Display products in grid
-cols = st.columns(COLUMNS)
-for i, p in enumerate(PRODUCTS):
-    if search and search.lower() not in p['name'].lower():
-        continue
-    col = cols[i%COLUMNS]
-    with col:
-        st.image(p['image'], use_column_width=True)
-        st.write(f"**{p['name']}**")
-        st.write(f"Category: {p['category']}")
-        st.write(f"NT${p['price']}")
-        qty = st.number_input("Qty", min_value=1, value=1, key=f"qty_{p['id']}", label_visibility="collapsed")
-        if st.button("Add to Cart", key=f"add_{p['id']}"):
-            add_to_cart(p['id'], qty)
-            st.success(f"Added {qty} x {p['name']} to cart")
+        name = st.text_input("Name")
+        address = st.text_area("Shipping Address")
+        pay = st.selectbox("Payment Method", ["Credit Card", "LINE Pay", "ATM Transfer", "Cash on Delivery"])
+
+        if st.button("💰 Confirm Purchase"):
+            st.success("🎉 Order Placed Successfully!")
+            clear_cart()
+            st.session_state.checkout = False
+
+    st.stop()
+
+# -------------------------
+# PRODUCT GRID UI
+# -------------------------
+st.subheader("🛒 Products")
+
+cols = st.columns(3)
+
+for i, product in enumerate(products):
+    with cols[i % 3]:
+        st.image(product["image"], use_column_width=True)
+        st.markdown(f"### {product['name']}")
+        st.write(f"💲 **NT${product['price']}**")
+        if st.button(f"Add to Cart - {product['name']}", key=product["name"]):
+            add_to_cart(product["name"], product["price"])
+            st.experimental_rerun()
