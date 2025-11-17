@@ -114,4 +114,4 @@ for item in items:
     i += 1
 
 st.write("---")
-st.caption("🛒 Clean UI • Popups • Payment Options • No Errors • v4.0")
+st.caption("🛒Leonardo online store, V4.0")
