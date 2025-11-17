@@ -22,7 +22,7 @@ def clear_cart():
     st.session_state.cart = {}
 
 # -------------------------
-# PRODUCT LIST (10 FINAL ITEMS)
+# PRODUCT LIST (10 ITEMS)
 # -------------------------
 products = [
     {
@@ -78,32 +78,66 @@ products = [
 ]
 
 # -------------------------
-# CART SUMMARY DISPLAY
+# CART SUMMARY (IMPROVED UI)
 # -------------------------
 total_items = sum(item["qty"] for item in st.session_state.cart.values())
 total_price = sum(item["qty"] * item["price"] for item in st.session_state.cart.values())
 
-with st.expander(f"🛒 Cart ({total_items} items) - NT${total_price}", expanded=False):
+st.markdown(
+    """
+    <style>
+        .cart-box {
+            padding: 15px;
+            background-color: #f0f7ff;
+            border-radius: 10px;
+            border: 1px solid #cce0ff;
+            margin-bottom: 15px;
+        }
+        .cart-header {
+            font-size: 22px;
+            font-weight: bold;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+with st.container():
+    st.markdown(
+        f"""
+        <div class="cart-box">
+            <div class="cart-header">🛒 Cart ({total_items} items) — <b>NT${total_price}</b></div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+with st.expander("📦 View Cart", expanded=True):
     if total_items == 0:
         st.write("Your cart is empty.")
     else:
         for name, info in st.session_state.cart.items():
-            st.write(f"**{name}** x {info['qty']} = NT${info['qty'] * info['price']}")
-        st.write("---")
-        if st.button("🧹 Clear Cart"):
-            clear_cart()
-            st.experimental_rerun()
+            st.write(f"**{name}** × {info['qty']} — NT${info['qty'] * info['price']}")
 
-        # -------------------------
-        # CHECKOUT BUTTON
-        # -------------------------
-        if st.button("✅ Proceed to Checkout"):
-            st.session_state.checkout = True
+        st.markdown("---")
+
+        colA, colB = st.columns(2)
+
+        with colA:
+            if st.button("🧹 Clear Cart"):
+                clear_cart()
+                st.rerun()
+
+        with colB:
+            if st.button("💳 Checkout"):
+                st.session_state.checkout = True
+                st.rerun()
 
 # -------------------------
 # CHECKOUT PAGE
 # -------------------------
-if "checkout" in st.session_state and st.session_state.checkout:
+if st.session_state.get("checkout", False):
+
     st.header("💳 Checkout")
 
     if total_items == 0:
@@ -111,23 +145,24 @@ if "checkout" in st.session_state and st.session_state.checkout:
     else:
         st.subheader("Order Summary")
         for name, info in st.session_state.cart.items():
-            st.write(f"{name} x {info['qty']} — NT${info['qty'] * info['price']}")
+            st.write(f"{name} × {info['qty']} — NT${info['qty'] * info['price']}")
 
         st.write(f"### **Total: NT${total_price}**")
 
-        name = st.text_input("Name")
+        name = st.text_input("Your Name")
         address = st.text_area("Shipping Address")
-        pay = st.selectbox("Payment Method", ["Credit Card", "LINE Pay", "ATM Transfer", "Cash on Delivery"])
+        payment = st.selectbox("Payment Method", ["Credit Card", "LINE Pay", "ATM Transfer", "Cash on Delivery"])
 
-        if st.button("💰 Confirm Purchase"):
-            st.success("🎉 Order Placed Successfully!")
+        if st.button("✅ Confirm Order"):
+            st.success("🎉 Order placed successfully! Thank you!")
             clear_cart()
             st.session_state.checkout = False
+            st.rerun()
 
     st.stop()
 
 # -------------------------
-# PRODUCT GRID UI
+# PRODUCT GRID
 # -------------------------
 st.subheader("🛒 Products")
 
@@ -138,6 +173,7 @@ for i, product in enumerate(products):
         st.image(product["image"], use_column_width=True)
         st.markdown(f"### {product['name']}")
         st.write(f"💲 **NT${product['price']}**")
-        if st.button(f"Add to Cart - {product['name']}", key=product["name"]):
+
+        if st.button(f"Add to Cart — {product['name']}", key=product["name"]):
             add_to_cart(product["name"], product["price"])
-            st.experimental_rerun()
+            st.rerun()
