@@ -1,254 +1,91 @@
 import streamlit as st
+import random
+from PIL import Image
+import requests
+from io import BytesIO
 
-# -------------------------
-# PAGE CONFIG
-# -------------------------
-st.set_page_config(page_title="Online Store", layout="wide")
+# --- PAGE CONFIG ---
+st.set_page_config(page_title="🛍️ Online Store", layout="wide")
+st.title("🛒 Welcome to the Online Store")
 
-st.markdown(
-    """
-    <style>
-        .product-card {
-            padding: 15px;
-            background: #ffffff;
-            border-radius: 12px;
-            border: 1px solid #e6e6e6;
-            box-shadow: 0px 3px 10px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            transition: 0.2s;
-        }
-        .product-card:hover {
-            box-shadow: 0px 6px 18px rgba(0,0,0,0.12);
-        }
-        .cart-box {
-            padding: 15px;
-            background-color: #eef6ff;
-            border-radius: 10px;
-            border: 1px solid #bcd9ff;
-            margin-bottom: 15px;
-        }
-        .cart-header {
-            font-size: 24px;
-            font-weight: bold;
-        }
-        .checkout-box {
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid #e1e1e1;
-            background: #fafafa;
-            box-shadow: 0px 4px 12px rgba(0,0,0,0.06);
-        }
-        .success-box {
-            padding: 20px;
-            border-radius: 12px;
-            background: #e7ffe7;
-            border: 1px solid #9ce79c;
-            text-align: center;
-            font-size: 22px;
-            font-weight: bold;
-            color: #1b6e1b;
-            box-shadow: 0px 4px 10px rgba(0,0,0,0.05);
-        }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-# -------------------------
-# SESSION STATE
-# -------------------------
+# --- SESSION STATE INITIALIZATION ---
 if "cart" not in st.session_state:
-    st.session_state.cart = {}
+    st.session_state.cart = []
+if "order_sent" not in st.session_state:
+    st.session_state.order_sent = False
 
-if "checkout" not in st.session_state:
-    st.session_state.checkout = False
-
-if "order_complete" not in st.session_state:
-    st.session_state.order_complete = False
-
-
-def add_to_cart(name, price):
-    if name in st.session_state.cart:
-        st.session_state.cart[name]["qty"] += 1
-    else:
-        st.session_state.cart[name] = {"price": price, "qty": 1}
-
-
-def clear_cart():
-    st.session_state.cart = {}
-
-
-# -------------------------
-# PRODUCTS (FINAL 10)
-# -------------------------
-products = [
+# --- ITEM DATA ---
+items = [
     {
         "name": "Classic Ballpoint Pen",
-        "price": 25,
-        "image": "https://th.bing.com/th/id/R.cb4aee1c689dbe892c081f77bed24ab4?rik=Ox67o%2b1d%2f7AQag&pid=ImgRaw&r=0",
+        "price": 39,
+        "img": "https://th.bing.com/th/id/R.cb4aee1c689dbe892c081f77bed24ab4?rik=Ox67o%2b1d%2f7AQag&pid=ImgRaw&r=0"
     },
     {
         "name": "Notebook A5 Ruled",
-        "price": 60,
-        "image": "https://th.bing.com/th/id/OIP.Slqd7KcvFd9qNHsZKyLnVQHaGP?rs=1&pid=ImgDetMain",
+        "price": 89,
+        "img": "https://th.bing.com/th/id/OIP.Slqd7KcvFd9qNHsZKyLnVQHaGP?rs=1&pid=ImgDetMain"
     },
     {
         "name": "Sticky Note Pack",
-        "price": 35,
-        "image": "https://th.bing.com/th/id/OIP.cwm_7SCYy0aBSS97RjAfNgHaFM?rs=1&pid=ImgDetMain",
+        "price": 59,
+        "img": "https://th.bing.com/th/id/OIP.cwm_7SCYy0aBSS97RjAfNgHaFM?rs=1&pid=ImgDetMain"
     },
     {
         "name": "Highlighter Set (4)",
-        "price": 55,
-        "image": "https://th.bing.com/th/id/OIP.b_YQ1kPRO4PN4m1iFO5yFAHaHa?rs=1&pid=ImgDetMain",
+        "price": 79,
+        "img": "https://th.bing.com/th/id/OIP.b_YQ1kPRO4PN4m1iFO5yFAHaHa?rs=1&pid=ImgDetMain"
     },
     {
         "name": "Mechanical Pencil 0.5mm",
-        "price": 30,
-        "image": "https://th.bing.com/th/id/OIP.Jq7xQPBZAXqs9xlz-Iw0fAHaHa?rs=1&pid=ImgDetMain",
-    },
-    {
-        "name": "Cozy Knit Socks (3 Pairs)",
-        "price": 80,
-        "image": "https://tse1.mm.bing.net/th/id/OIP.zJb_59YSs8dS-yqhsxnSYwHaGT?rs=1&pid=ImgDetMain",
-    },
-    {
-        "name": "Everyday Cotton T-shirt",
-        "price": 120,
-        "image": "https://tse2.mm.bing.net/th/id/OIP.uOktto4M5ejy6b0RIiiNBAHaIc?rs=1&pid=ImgDetMain",
-    },
-    {
-        "name": "Lightweight Windbreaker",
-        "price": 250,
-        "image": "https://tse1.mm.bing.net/th/id/OIP.8W6syRyqiZN2RBwYykI3RwHaIo?rs=1&pid=ImgDetMain",
-    },
-    {
-        "name": "Classic Baseball Cap",
-        "price": 90,
-        "image": "https://tse1.mm.bing.net/th/id/OIP.gS2WiHOUyw5mV5cfU_R8qgHaHa?rs=1&pid=ImgDetMain",
-    },
-    {
-        "name": "Comfort Flip-flops",
-        "price": 70,
-        "image": "https://tse3.mm.bing.net/th/id/OIP.w0bIOKTROYzYouSxxSiuawHaE1?rs=1&pid=ImgDetMain",
+        "price": 49,
+        "img": "https://th.bing.com/th/id/OIP.Jq7xQPBZAXqs9xlz-Iw0fAHaHa?rs=1&pid=ImgDetMain"
     },
 ]
 
+# --- SIDEBAR CART UI ---
+st.sidebar.header("🛍️ Your Cart")
+for c in st.session_state.cart:
+    st.sidebar.write(f"• {c['name']} — ${c['price']}")
 
-# -------------------------
-# CART SUMMARY (BETTER UI)
-# -------------------------
-total_items = sum(item["qty"] for item in st.session_state.cart.values())
-total_price = sum(item["qty"] * item["price"] for item in st.session_state.cart.values())
+if st.session_state.cart:
+    total = sum([c['price'] for c in st.session_state.cart])
+    st.sidebar.subheader(f"Total: ${total}")
 
-st.markdown(
-    f"""
-    <div class="cart-box">
-        <div class="cart-header">🛒 Cart ({total_items} items) — <b>NT${total_price}</b></div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+    if st.sidebar.button("✔️ Checkout", use_container_width=True):
+        st.session_state.order_sent = True
+        st.session_state.cart = []
+        st.experimental_rerun()
 
-with st.expander("📦 View Cart", expanded=True):
-    if total_items == 0:
-        st.write("Your cart is empty.")
-    else:
-        for name, info in st.session_state.cart.items():
-            st.write(f"**{name}** × {info['qty']} — NT${info['qty'] * info['price']}")
+# --- ORDER CONFIRMATION MESSAGE ---
+if st.session_state.order_sent:
+    st.success("🎉 Your order is sent! Thank you for your shopping.")
+    st.info("We appreciate your purchase. Your items will be delivered soon!")
 
-        st.markdown("---")
-        colA, colB = st.columns(2)
-
-        with colA:
-            if st.button("🧹 Clear Cart"):
-                clear_cart()
-                st.rerun()
-
-        with colB:
-            if st.button("💳 Checkout"):
-                st.session_state.checkout = True
-                st.session_state.order_complete = False
-                st.rerun()
-
-
-# -------------------------
-# CHECKOUT PAGE
-# -------------------------
-if st.session_state.checkout:
-
-    st.title("💳 Checkout")
-
-    if total_items == 0:
-        st.warning("Your cart is empty!")
-        st.stop()
-
-    st.markdown('<div class="checkout-box">', unsafe_allow_html=True)
-
-    st.subheader("🧾 Order Summary")
-    for name, info in st.session_state.cart.items():
-        st.write(f"• {name} × {info['qty']} — NT${info['qty'] * info['price']}")
-
-    st.write(f"### **Total: NT${total_price}**")
-
-    st.subheader("👤 Customer Info")
-    name = st.text_input("Name")
-    address = st.text_area("Shipping Address")
-    payment = st.selectbox("Payment Method", ["Credit Card", "LINE Pay", "ATM Bank Transfer", "Cash on Delivery"])
-
-    if st.button("✅ Place Order"):
-        if not name or not address:
-            st.error("Please fill out all fields.")
-        else:
-            st.session_state.order_complete = True
-            clear_cart()
-            st.rerun()
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    st.stop()
-
-# -------------------------
-# SUCCESS MESSAGE PAGE
-# -------------------------
-if st.session_state.order_complete:
-
-    st.markdown(
-        """
-        <div class="success-box">
-            🎉 Your order is sent!  
-            <br>Thank you for your shopping!
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.balloons()
-
-    if st.button("🏬 Back to Store"):
-        st.session_state.order_complete = False
-        st.rerun()
-
-    st.stop()
-
-
-# -------------------------
-# PRODUCT GRID
-# -------------------------
-st.subheader("🛒 Products")
+# --- MAIN UI LAYOUT ---
+st.write("### ✨ Choose your items below")
 
 cols = st.columns(3)
+col_index = 0
 
-for i, product in enumerate(products):
-    with cols[i % 3]:
-        st.markdown('<div class="product-card">', unsafe_allow_html=True)
+for item in items:
+    with cols[col_index]:
+        try:
+            response = requests.get(item["img"])
+            img = Image.open(BytesIO(response.content))
+            st.image(img, width=180)
+        except:
+            st.warning("Image unavailable")
 
-        st.image(product["image"], use_column_width=True)
-        st.markdown(f"### {product['name']}")
-        st.write(f"💲 **NT${product['price']}**")
+        st.write(f"**{item['name']}**")
+        st.write(f"💲 Price: ${item['price']}")
 
-        if st.button(f"Add to Cart — {product['name']}", key=product["name"]):
-            add_to_cart(product["name"], product["price"])
-            st.rerun()
+        if st.button(f"Add to Cart: {item['name']}", key=item['name']):
+            st.session_state.cart.append(item)
+            st.toast(f"Added {item['name']} to cart!", icon="🛒")
+            st.experimental_rerun()
 
-        st.markdown('</div>', unsafe_allow_html=True)
+    col_index = (col_index + 1) % 3
+
+st.write("---")
+st.caption("Enhanced UI • Clean Layout • Instant Checkout Messages • v1.2")
