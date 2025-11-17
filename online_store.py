@@ -52,9 +52,8 @@ items = [
 st.title("🛒 Super Clean Online Store")
 
 # --- CART BUTTON ---
-with st.container():
-    st.markdown("### 🛍️ Your Shopping Cart")
-    cart_expander = st.expander(f"🛒 Cart ({len(st.session_state.cart)} items)", expanded=True)
+st.markdown("### 🛍️ Your Shopping Cart")
+cart_expander = st.expander(f"🛒 Cart ({len(st.session_state.cart)} items)", expanded=True)
 
 # --- CART UI ---
 with cart_expander:
@@ -81,28 +80,11 @@ with cart_expander:
 
 # --- POPUP MODAL FOR ADD TO CART ---
 if st.session_state.show_popup:
-    st.markdown(
-        f"""
-        <div style="
-            position: fixed;
-            top: 30%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0px 4px 18px rgba(0,0,0,0.25);
-            z-index: 9999;
-            text-align: center;
-            width: 300px;
-        ">
-            <h3>🛒 Added to Cart!</h3>
-            <p><b>{st.session_state.last_added}</b> has been added.</p>
-            <button onclick="window.location.reload()">OK</button>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.info(f"🛒 **{st.session_state.last_added}** has been added to your cart!")
+
+    if st.button("OK", key="popup_ok"):
+        st.session_state.show_popup = False
+        st.session_state.last_added = None
 
 # --- MAIN STORE DISPLAY ---
 st.write("### 🛍️ Choose Your Items")
@@ -132,4 +114,4 @@ for item in items:
     i += 1
 
 st.write("---")
-st.caption("🛒 Clean UI • Popups • Payment Options • No Errors • v3.0")
+st.caption("🛒 Clean UI • Popups • Payment Options • No Errors • v4.0")
