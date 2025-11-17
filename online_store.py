@@ -1,91 +1,131 @@
 import streamlit as st
-import random
-from PIL import Image
-import requests
-from io import BytesIO
 
-# --- PAGE CONFIG ---
-st.set_page_config(page_title="🛍️ Online Store", layout="wide")
-st.title("🛒 Welcome to the Online Store")
+# -------------------------------------------------
+# PAGE SETUP
+# -------------------------------------------------
+st.set_page_config(page_title="Common Store", layout="wide")
 
-# --- SESSION STATE INITIALIZATION ---
+st.markdown("""
+    <style>
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            padding: 15px;
+            background: #ffffff;
+            box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .cart-button {
+            background-color: #ff9900;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: black;
+        }
+        .checkout-btn {
+            background-color: #4CAF50 !important;
+            color: white !important;
+            font-size: 18px !important;
+            font-weight: bold !important;
+            width: 100%;
+            border-radius: 10px !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+# -------------------------------------------------
+# SESSION STATE
+# -------------------------------------------------
 if "cart" not in st.session_state:
     st.session_state.cart = []
-if "order_sent" not in st.session_state:
-    st.session_state.order_sent = False
 
-# --- ITEM DATA ---
-items = [
-    {
-        "name": "Classic Ballpoint Pen",
-        "price": 39,
-        "img": "https://th.bing.com/th/id/R.cb4aee1c689dbe892c081f77bed24ab4?rik=Ox67o%2b1d%2f7AQag&pid=ImgRaw&r=0"
-    },
-    {
-        "name": "Notebook A5 Ruled",
-        "price": 89,
-        "img": "https://th.bing.com/th/id/OIP.Slqd7KcvFd9qNHsZKyLnVQHaGP?rs=1&pid=ImgDetMain"
-    },
-    {
-        "name": "Sticky Note Pack",
-        "price": 59,
-        "img": "https://th.bing.com/th/id/OIP.cwm_7SCYy0aBSS97RjAfNgHaFM?rs=1&pid=ImgDetMain"
-    },
-    {
-        "name": "Highlighter Set (4)",
-        "price": 79,
-        "img": "https://th.bing.com/th/id/OIP.b_YQ1kPRO4PN4m1iFO5yFAHaHa?rs=1&pid=ImgDetMain"
-    },
-    {
-        "name": "Mechanical Pencil 0.5mm",
-        "price": 49,
-        "img": "https://th.bing.com/th/id/OIP.Jq7xQPBZAXqs9xlz-Iw0fAHaHa?rs=1&pid=ImgDetMain"
-    },
+if "show_cart" not in st.session_state:
+    st.session_state.show_cart = False
+
+if "order_message" not in st.session_state:
+    st.session_state.order_message = None
+
+
+# -------------------------------------------------
+# PRODUCTS
+# -------------------------------------------------
+PRODUCTS = [
+    ("Classic Ballpoint Pen", "https://th.bing.com/th/id/R.cb4aee1c689dbe892c081f77bed24ab4?rik=Ox67o%2b1d%2f7AQag&pid=ImgRaw&r=0", 25),
+    ("Notebook A5 Ruled", "https://th.bing.com/th/id/OIP.Slqd7KcvFd9qNHsZKyLnVQHaGP?rs=1&pid=ImgDetMain", 55),
+    ("Sticky Note Pack", "https://th.bing.com/th/id/OIP.cwm_7SCYy0aBSS97RjAfNgHaFM?rs=1&pid=ImgDetMain", 30),
+    ("Highlighter Set (4)", "https://th.bing.com/th/id/OIP.b_YQ1kPRO4PN4m1iFO5yFAHaHa?rs=1&pid=ImgDetMain", 45),
+    ("Mechanical Pencil 0.5mm", "https://th.bing.com/th/id/OIP.Jq7xQPBZAXqs9xlz-Iw0fAHaHa?rs=1&pid=ImgDetMain", 40),
+    ("Cozy Knit Socks (3 Pairs)", "https://tse1.mm.bing.net/th/id/OIP.zJb_59YSs8dS-yqhsxnSYwHaGT?rs=1&pid=ImgDetMain", 75),
+    ("Everyday Cotton T-shirt", "https://tse2.mm.bing.net/th/id/OIP.uOktto4M5ejy6b0RIiiNBAHaIc?rs=1&pid=ImgDetMain", 150),
+    ("Lightweight Windbreaker", "https://tse1.mm.bing.net/th/id/OIP.8W6syRyqiZN2RBwYykI3RwHaIo?rs=1&pid=ImgDetMain", 320),
+    ("Classic Baseball Cap", "https://tse1.mm.bing.net/th/id/OIP.gS2WiHOUyw5mV5cfU_R8qgHaHa?rs=1&pid=ImgDetMain", 110),
+    ("Comfort Flip-flops", "https://tse3.mm.bing.net/th/id/OIP.w0bIOKTROYzYouSxxSiuawHaE1?rs=1&pid=ImgDetMain", 90),
 ]
 
-# --- SIDEBAR CART UI ---
-st.sidebar.header("🛍️ Your Cart")
-for c in st.session_state.cart:
-    st.sidebar.write(f"• {c['name']} — ${c['price']}")
 
-if st.session_state.cart:
-    total = sum([c['price'] for c in st.session_state.cart])
-    st.sidebar.subheader(f"Total: ${total}")
+# -------------------------------------------------
+# NAVIGATION BAR
+# -------------------------------------------------
+cols = st.columns([6, 1])
 
-    if st.sidebar.button("✔️ Checkout", use_container_width=True):
-        st.session_state.order_sent = True
-        st.session_state.cart = []
-        st.experimental_rerun()
+with cols[0]:
+    st.markdown("## 🏪 **Common Store — Everything You Need**")
 
-# --- ORDER CONFIRMATION MESSAGE ---
-if st.session_state.order_sent:
-    st.success("🎉 Your order is sent! Thank you for your shopping.")
-    st.info("We appreciate your purchase. Your items will be delivered soon!")
+with cols[1]:
+    if st.button("🛒 Cart", key="cart_btn"):
+        st.session_state.show_cart = not st.session_state.show_cart
 
-# --- MAIN UI LAYOUT ---
-st.write("### ✨ Choose your items below")
 
-cols = st.columns(3)
-col_index = 0
+# -------------------------------------------------
+# CHECKOUT SUCCESS MESSAGE
+# -------------------------------------------------
+if st.session_state.order_message:
+    st.success(st.session_state.order_message)
 
-for item in items:
-    with cols[col_index]:
-        try:
-            response = requests.get(item["img"])
-            img = Image.open(BytesIO(response.content))
-            st.image(img, width=180)
-        except:
-            st.warning("Image unavailable")
 
-        st.write(f"**{item['name']}**")
-        st.write(f"💲 Price: ${item['price']}")
+# -------------------------------------------------
+# CART PANEL
+# -------------------------------------------------
+if st.session_state.show_cart:
+    st.markdown("### 🛒 Your Cart")
+    if len(st.session_state.cart) == 0:
+        st.info("Your cart is empty.")
+    else:
+        total = 0
+        for item in st.session_state.cart:
+            st.write(f"- {item[0]} — NT$ {item[2]}")
+            total += item[2]
 
-        if st.button(f"Add to Cart: {item['name']}", key=item['name']):
-            st.session_state.cart.append(item)
-            st.toast(f"Added {item['name']} to cart!", icon="🛒")
-            st.experimental_rerun()
+        st.write(f"### **Total: NT$ {total}**")
+        if st.button("✅ Checkout", key="checkout"):
+            st.session_state.cart = []
+            st.session_state.order_message = "🎉 Your order is sent. Thank you for your shopping!"
+            st.session_state.show_cart = False
 
-    col_index = (col_index + 1) % 3
 
-st.write("---")
-st.caption("Enhanced UI • Clean Layout • Instant Checkout Messages • v1.2")
+st.markdown("---")
+
+
+# -------------------------------------------------
+# PRODUCT LIST (single page)
+# -------------------------------------------------
+st.markdown("### 🛍️ Items Available")
+
+grid_cols = st.columns(3)
+
+index = 0
+for name, img, price in PRODUCTS:
+    with grid_cols[index % 3]:
+        st.markdown(f"""
+            <div class='product-card'>
+                <img src="{img}" width="180"><br><br>
+                <strong>{name}</strong><br>
+                <span style='font-size:18px;'>NT$ {price}</span><br><br>
+            </div>
+        """, unsafe_allow_html=True)
+
+        if st.button(f"Add to cart {name}", key=f"add_{name}"):
+            st.session_state.cart.append((name, img, price))
+
+    index += 1
